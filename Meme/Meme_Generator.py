@@ -18,7 +18,10 @@ client = discord.Client()
 
 bot = commands.Bot(command_prefix='!')
 
-memes = requests.get('https://api.imgflip.com/get_memes').json()['data']['memes']
+async with aiohttp.ClientSession() as session:
+    async with session.get('https://api.imgflip.com/get_memes') as r:
+        if r.status == 200:
+            memes = await r.json()['data']['memes']
 
 @bot.command(name='meme')
 async def meme(ctx, meme_id: str, *args):
@@ -40,17 +43,17 @@ async def meme(ctx, meme_id: str, *args):
   params = dict(template_id=template_id, username=acc_username, password=acc_password)
   for i, text in enumerate(args):
       params["text"+str(i)] = text
-  res = requests.get(url, params=params)
-
-  data = res.json()
+  async with aiohttp.ClientSession() as session:
+      async with session.get(url, params=params) as r:
+         data = r.json()
 
   print("\n\nTimestamp: " + str(datetime.now().strftime("%Y-%m-%d %H-%M-%S")) +
         "\nMeme: " + str(data['data']['url']))
     
   await ctx.send(data['data']['url'])
 
-@bot.command(name='meme_templates')
-async def meme(ctx):
+@bot.command(aliases=['templates'])
+async def meme_templates(ctx):
   await ctx.send('https://api.imgflip.com/popular_meme_ids')
 
 bot.run(token)
