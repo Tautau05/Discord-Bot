@@ -33,15 +33,18 @@ async def meme(ctx, meme_id: str, *args):
       for meme in memes:
           if meme_id.casefold() in meme['name'].casefold():
               template_id = meme['id']
+              template_found = True
               break
+
   # Check for valid template_id
-  for i in memes:
-    if i['id'] == meme_id:
-      template_found = True
-      break  
   if template_found == False:
-    await ctx.send('Meme not found, check the ID with !meme_templates')
-    return
+    for i in memes:
+      if i['id'] == meme_id:
+        template_found = True
+        break  
+    if template_found == False:
+      await ctx.send('Meme not found, check the ID with !meme_templates')
+      return
 
   params = dict(template_id=template_id, username=acc_username, password=acc_password)
   for i, text in enumerate(args):
