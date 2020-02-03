@@ -17,11 +17,28 @@ client = discord.Client()
 
 bot = commands.Bot(command_prefix='!')
 
+memes = requests.get('https://api.imgflip.com/get_memes').json()['data']['memes']
 
 @bot.command(name='meme')
-async def meme(ctx, template_id: int, caption0: str, caption1: str):
+async def meme(ctx, meme_id: str, *args):
   url = 'https://api.imgflip.com/caption_image'
-  params = dict(template_id=template_id, username=acc_username, password=acc_password, text0=caption0, text1=caption1)
+  template_id = 0
+  try:
+      # Check if ID supplied
+      template_id = int(meme_id)
+  except ValueError:
+      # If ID not supplied try to guess meme from name
+      for meme in memes:
+          if meme_id.casefold() in meme['name'].casefold():
+              template_id = meme['id']
+              break
+  if template_id == 0:
+    await ctx.send('Meme not found, check the ID with !meme_templates')
+    return
+
+  params = dict(template_id=template_id, username=acc_username, password=acc_password)
+  for i, text in enumerate(args):
+      params["text"+str(i)] = text
   res = requests.get(url, params=params)
 
   data = res.json()
