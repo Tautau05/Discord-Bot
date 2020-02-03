@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import requests
 from datetime import datetime
@@ -7,7 +8,7 @@ from discord.ext import commands
 
 
 #Discord Bot Token
-token = ()
+token = ""
 #imgflip account
 acc_username = ""
 acc_password = ""
